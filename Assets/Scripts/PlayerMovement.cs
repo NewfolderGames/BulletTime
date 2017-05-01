@@ -200,6 +200,7 @@ public class PlayerMovement : MonoBehaviour {
 
 		transform.position = playerFakeCameraTransform.position + Vector3.down * 0.7f;
 		playerCameraTransform.rotation = playerFakeCameraTransform.rotation;
+		playerRotationVertical = 0f;
 
 		playerCamera.gameObject.SetActive (true);
 		playerFakeCamera.gameObject.SetActive (false);
