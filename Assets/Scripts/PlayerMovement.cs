@@ -80,15 +80,9 @@ public class PlayerMovement : MonoBehaviour {
 
 						playerObstacleType = rayhit.collider.GetComponent<MapObstacle> ().obstacleType;
 
-						playerAvailableMove = false;
-						playerUsingObstacle = true;
 
-						playerCamera.gameObject.SetActive (false);
-						playerFakeCamera.gameObject.SetActive (true);
 
-						StartCoroutine (PlayObstacle (playerObstacleType));
-
-						Debug.Log ("XXXXXXXXXXXXX");
+						StartCoroutine (PlayObstacle ());
 
 						return;
 
@@ -165,23 +159,28 @@ public class PlayerMovement : MonoBehaviour {
 	
 	}
 
-	private	IEnumerator	PlayObstacle(MapObstacle.Obstacle obstacle) {
+	private	IEnumerator	PlayObstacle() {
 
-		playerFakeCameraAnimator.SetBool ("Skip", true);
-		AnimatorStateInfo info = playerFakeCameraAnimator.GetCurrentAnimatorStateInfo ((int)obstacle);
+		playerAvailableMove = false;
+		playerUsingObstacle = true;
+
+		playerCamera.gameObject.SetActive (false);
+		playerFakeCamera.gameObject.SetActive (true);
+
+		playerFakeCameraAnimator.Play ("ObstacleSkip", -1, 0f);
+
+		AnimatorStateInfo info = playerFakeCameraAnimator.GetCurrentAnimatorStateInfo (0);
 
 		yield return new WaitForSeconds (info.length);
 
 		playerAvailableMove = true;
 		playerUsingObstacle = false;
 
-		playerCamera.gameObject.SetActive (true);
-		playerFakeCamera.gameObject.SetActive (false);
-
 		transform.position = playerFakeCameraTransform.position + Vector3.down * playerFakeCameraTransform.localPosition.y;
 		playerCameraTransform.rotation = playerFakeCameraTransform.rotation;
 
-		playerFakeCameraAnimator.SetBool ("Skip", false);
+		playerCamera.gameObject.SetActive (true);
+		playerFakeCamera.gameObject.SetActive (false);
 
 	}
 
