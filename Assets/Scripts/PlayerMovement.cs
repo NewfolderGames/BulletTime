@@ -171,29 +171,32 @@ public class PlayerMovement : MonoBehaviour {
 
 	private	IEnumerator	PlayObstacle(MapObstacle.Obstacle obstacle) {
 
+		float time = 0f;
+
 		playerAvailableMove = false;
 		playerUsingObstacle = true;
 
 		playerCamera.gameObject.SetActive (false);
 		playerFakeCamera.gameObject.SetActive (true);
 
-		playerFakeCameraAnimator.StopPlayback ();
-
 		switch(playerObstacleType) {
 			
 			case MapObstacle.Obstacle.Skip:
 				playerFakeCameraAnimator.Play ("ObstacleSkip", -1, 0f);
+				time = 1f;
+
 				break;
 
 			case MapObstacle.Obstacle.Climb3M:
 				playerFakeCameraAnimator.Play ("ObstacleClimb3M", -1, 0f);
+				time = 2f;
 				break;
 
 		}
 
 		AnimatorStateInfo info = playerFakeCameraAnimator.GetCurrentAnimatorStateInfo (0);
 
-		yield return new WaitForSeconds (info.length);
+		yield return new WaitForSeconds (time);
 
 		playerAvailableMove = true;
 		playerUsingObstacle = false;
