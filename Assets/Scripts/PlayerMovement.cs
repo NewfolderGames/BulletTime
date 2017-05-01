@@ -49,7 +49,7 @@ public class PlayerMovement : MonoBehaviour {
 		playerCharacterController = GetComponent<CharacterController> ();
 
 		playerSpeed = 5f;
-		playerSpeedJump = 5f;
+		playerSpeedJump = 4f;
 		playerSensitivity = 2.5f;
 
 	}
@@ -76,7 +76,7 @@ public class PlayerMovement : MonoBehaviour {
 				if (playerAvailableObstacle) {
 
 					RaycastHit rayhit;
-					if (Physics.Raycast (transform.position + Vector3.down * 0.5f, transform.forward, out rayhit, Mathf.Infinity, LayerMask.GetMask ("Obstacle"))) {
+					if (Physics.Raycast (transform.position + Vector3.down * 0.5f, transform.forward, out rayhit, 2f, LayerMask.GetMask ("Obstacle"))) {
 
 						playerObstacleType = rayhit.collider.GetComponent<MapObstacle> ().obstacleType;
 
@@ -123,6 +123,12 @@ public class PlayerMovement : MonoBehaviour {
 					Debug.Log("Climbable3M In");
 					break;
 
+				case MapObstacle.Obstacle.Slide:
+
+					playerAvailableObstacle = true;
+					Debug.Log("Slide In");
+					break;
+
 			}
 
 		}
@@ -146,6 +152,12 @@ public class PlayerMovement : MonoBehaviour {
 
 					playerAvailableObstacle = false;
 					Debug.Log("Climbable3M Out");
+					break;
+
+				case MapObstacle.Obstacle.Slide:
+
+					playerAvailableObstacle = false;
+					Debug.Log("Slide Out");
 					break;
 
 			}
@@ -190,6 +202,11 @@ public class PlayerMovement : MonoBehaviour {
 			case MapObstacle.Obstacle.Climb3M:
 				playerFakeCameraAnimator.Play ("ObstacleClimb3M", -1, 0f);
 				time = 2f;
+				break;
+
+			case MapObstacle.Obstacle.Slide:
+				playerFakeCameraAnimator.Play ("ObstacleSlide", -1, 0f);
+				time = 1f;
 				break;
 
 		}

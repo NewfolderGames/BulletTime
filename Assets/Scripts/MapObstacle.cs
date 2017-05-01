@@ -7,7 +7,8 @@ public class MapObstacle : MonoBehaviour {
 	public enum Obstacle {
 
 		Skip,
-		Climb3M
+		Climb3M,
+		Slide
 
 	}
 
