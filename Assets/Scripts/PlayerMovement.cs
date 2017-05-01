@@ -80,9 +80,7 @@ public class PlayerMovement : MonoBehaviour {
 
 						playerObstacleType = rayhit.collider.GetComponent<MapObstacle> ().obstacleType;
 
-
-
-						StartCoroutine (PlayObstacle ());
+						StartCoroutine (PlayObstacle (playerObstacleType));
 
 						return;
 
@@ -119,6 +117,12 @@ public class PlayerMovement : MonoBehaviour {
 					Debug.Log("Skipable In");
 					break;
 
+				case MapObstacle.Obstacle.Climb3M:
+
+					playerAvailableObstacle = true;
+					Debug.Log("Climbable3M In");
+					break;
+
 			}
 
 		}
@@ -136,6 +140,12 @@ public class PlayerMovement : MonoBehaviour {
 
 					playerAvailableObstacle = false;
 					Debug.Log("Skipable Out");
+					break;
+
+				case MapObstacle.Obstacle.Climb3M:
+
+					playerAvailableObstacle = false;
+					Debug.Log("Climbable3M Out");
 					break;
 
 			}
@@ -159,7 +169,7 @@ public class PlayerMovement : MonoBehaviour {
 	
 	}
 
-	private	IEnumerator	PlayObstacle() {
+	private	IEnumerator	PlayObstacle(MapObstacle.Obstacle obstacle) {
 
 		playerAvailableMove = false;
 		playerUsingObstacle = true;
@@ -167,7 +177,19 @@ public class PlayerMovement : MonoBehaviour {
 		playerCamera.gameObject.SetActive (false);
 		playerFakeCamera.gameObject.SetActive (true);
 
-		playerFakeCameraAnimator.Play ("ObstacleSkip", -1, 0f);
+		playerFakeCameraAnimator.StopPlayback ();
+
+		switch(playerObstacleType) {
+			
+			case MapObstacle.Obstacle.Skip:
+				playerFakeCameraAnimator.Play ("ObstacleSkip", -1, 0f);
+				break;
+
+			case MapObstacle.Obstacle.Climb3M:
+				playerFakeCameraAnimator.Play ("ObstacleClimb3M", -1, 0f);
+				break;
+
+		}
 
 		AnimatorStateInfo info = playerFakeCameraAnimator.GetCurrentAnimatorStateInfo (0);
 
@@ -176,7 +198,7 @@ public class PlayerMovement : MonoBehaviour {
 		playerAvailableMove = true;
 		playerUsingObstacle = false;
 
-		transform.position = playerFakeCameraTransform.position + Vector3.down * playerFakeCameraTransform.localPosition.y;
+		transform.position = playerFakeCameraTransform.position + Vector3.down * 0.7f;
 		playerCameraTransform.rotation = playerFakeCameraTransform.rotation;
 
 		playerCamera.gameObject.SetActive (true);
