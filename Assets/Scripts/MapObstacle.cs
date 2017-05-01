@@ -8,12 +8,30 @@ public class MapObstacle : MonoBehaviour {
 
 		Skip,
 		Climb3M,
-		Slide
+		Climb4M,
+		Slide,
+		Swing
 
 	}
 
-
 	public	Obstacle	obstacleType = Obstacle.Skip;
+	public	bool		obstacleMidair = false;
+
+	void Awake() {
+
+		switch (obstacleType) {
+
+			case Obstacle.Swing: case Obstacle.Skip :
+				obstacleMidair = true;
+				break;
+			
+			default :
+				obstacleMidair = false;
+				break;
+
+		}
+
+	}
 
 
 }

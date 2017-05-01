@@ -33,7 +33,8 @@ public class PlayerMovement : MonoBehaviour {
 	private	bool	playerAvailableJump;
 
 	// Obstacle
-	private	MapObstacle.Obstacle playerObstacleType;
+	private	MapObstacle.Obstacle	playerObstacleType;
+	private	MapObstacle				playerObstacle;
 
 	private	bool	playerAvailableObstacle;
 	private	bool	playerUsingObstacle;
@@ -71,25 +72,34 @@ public class PlayerMovement : MonoBehaviour {
 			playerCameraTransform.localRotation = Quaternion.Euler (playerRotationVertical, 0f, 0f);
 
 			// Jump
-			if (Input.GetButtonDown ("Jump") && playerAvailableJump && playerAvailableMove) {
+			if (Input.GetButtonDown ("Jump") && playerAvailableMove) {
 
 				if (playerAvailableObstacle) {
 
 					RaycastHit rayhit;
-					if (Physics.Raycast (transform.position + Vector3.down * 0.5f, transform.forward, out rayhit, 2f, LayerMask.GetMask ("Obstacle"))) {
+					if (Physics.Raycast (transform.position + Vector3.down * 0.5f, transform.forward, out rayhit, 15f, LayerMask.GetMask ("Obstacle"))) {
 
-						playerObstacleType = rayhit.collider.GetComponent<MapObstacle> ().obstacleType;
+						MapObstacle obstacle = rayhit.collider.GetComponent<MapObstacle> ();
+						playerObstacleType = obstacle.obstacleType;
 
-						StartCoroutine (PlayObstacle (playerObstacleType));
+						if (playerAvailableJump || obstacle.obstacleMidair) {
 
+							StartCoroutine (PlayObstacle (playerObstacleType));
+
+						}
+							
 						return;
 
 					}
 
 				}
 
-				playerVelocity += Vector3.up * playerSpeedJump;
-				playerAvailableJump = false;
+				if (playerAvailableJump) {
+
+					playerVelocity += Vector3.up * playerSpeedJump;
+					playerAvailableJump = false;
+
+				} 
 
 			}
 
@@ -108,28 +118,8 @@ public class PlayerMovement : MonoBehaviour {
 
 		if(other.CompareTag("Obstacle")) {
 
-			MapObstacle obstacle = other.GetComponent<MapObstacle>();
-			switch(obstacle.obstacleType) {
-
-				case MapObstacle.Obstacle.Skip:
-					 
-					playerAvailableObstacle = true;
-					Debug.Log("Skipable In");
-					break;
-
-				case MapObstacle.Obstacle.Climb3M:
-
-					playerAvailableObstacle = true;
-					Debug.Log("Climbable3M In");
-					break;
-
-				case MapObstacle.Obstacle.Slide:
-
-					playerAvailableObstacle = true;
-					Debug.Log("Slide In");
-					break;
-
-			}
+			playerObstacle = other.GetComponent<MapObstacle>();
+			playerAvailableObstacle = true;
 
 		}
 
@@ -140,27 +130,7 @@ public class PlayerMovement : MonoBehaviour {
 		if(other.CompareTag("Obstacle")) {
 
 			MapObstacle obstacle = other.GetComponent<MapObstacle>();
-			switch(obstacle.obstacleType) {
-
-				case MapObstacle.Obstacle.Skip:
-
-					playerAvailableObstacle = false;
-					Debug.Log("Skipable Out");
-					break;
-
-				case MapObstacle.Obstacle.Climb3M:
-
-					playerAvailableObstacle = false;
-					Debug.Log("Climbable3M Out");
-					break;
-
-				case MapObstacle.Obstacle.Slide:
-
-					playerAvailableObstacle = false;
-					Debug.Log("Slide Out");
-					break;
-
-			}
+			playerAvailableObstacle = false;
 
 		}
 
@@ -204,9 +174,19 @@ public class PlayerMovement : MonoBehaviour {
 				time = 2f;
 				break;
 
+			case MapObstacle.Obstacle.Climb4M:
+				playerFakeCameraAnimator.Play ("ObstacleClimb4M", -1, 0f);
+				time = 2.5f;
+				break;
+
 			case MapObstacle.Obstacle.Slide:
 				playerFakeCameraAnimator.Play ("ObstacleSlide", -1, 0f);
 				time = 1f;
+				break;
+
+			case MapObstacle.Obstacle.Swing:
+				playerFakeCameraAnimator.Play ("ObstacleSwing", -1, 0f);
+				time = 2f;
 				break;
 
 		}
