@@ -16,6 +16,9 @@ public class PlayerMovement : MonoBehaviour {
 
 	public	Animator	playerFakeCameraAnimator;
 
+	public	float		playerCameraFov = 60;
+	public	float		playerCameraFovSlowmotion = 120f;
+
 	// Animation
 	public	AnimationClip[]	playerObstacleAnimations;
 
@@ -45,6 +48,12 @@ public class PlayerMovement : MonoBehaviour {
 	private	float	playerRotationHorizonal;
 	private	float	playerRotationVertical;
 
+	// Time
+	private	float	playerTimeSlowdown;
+	private	float	playerTimeSlowdownDurantion;
+	private	bool	playerAvailableSlowdown = true;
+
+
 	void	Awake() {
 
 		playerCharacterController = GetComponent<CharacterController> ();
@@ -52,6 +61,9 @@ public class PlayerMovement : MonoBehaviour {
 		playerSpeed = 5f;
 		playerSpeedJump = 4f;
 		playerSensitivity = 2.5f;
+
+		playerTimeSlowdown = 0.1f;
+		playerTimeSlowdownDurantion = 10f;
 
 	}
 
@@ -110,7 +122,29 @@ public class PlayerMovement : MonoBehaviour {
 
 		}
 
+		// Time
+		if (playerAvailableSlowdown) {
 
+			if (Input.GetMouseButtonDown (2)) {
+
+				playerAvailableSlowdown = false;
+				Time.timeScale = playerTimeSlowdown;
+				Time.fixedDeltaTime = Time.timeScale * 0.02f;
+				Debug.Log ("aayy");
+
+			}
+
+		} else {
+
+			Time.timeScale += 1f / playerTimeSlowdownDurantion * Time.unscaledDeltaTime;
+			if (Time.timeScale >= 1f) {
+
+				playerAvailableSlowdown = true;
+				return;
+
+			}
+
+		}
 
 	}
 
