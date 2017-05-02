@@ -1,8 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerMovement : MonoBehaviour {
+
+	#region Variables
 
 	// Component
 	private	CharacterController playerCharacterController;
@@ -15,9 +18,6 @@ public class PlayerMovement : MonoBehaviour {
 	public	Transform	playerFakeCameraTransform;
 
 	public	Animator	playerFakeCameraAnimator;
-
-	public	float		playerCameraFov = 60;
-	public	float		playerCameraFovSlowmotion = 120f;
 
 	// Animation
 	public	AnimationClip[]	playerObstacleAnimations;
@@ -52,8 +52,18 @@ public class PlayerMovement : MonoBehaviour {
 	private	float	playerTimeSlowdown;
 	private	float	playerTimeSlowdownDurantion;
 	private	bool	playerAvailableSlowdown = true;
+	public	Text	playerTimeText;
 
+	// Weapon
+	public	Animator	playerWeaponPistolAnimator;
+	private	int			playerWeaponPistolAmmo = 10;
+	private	int			playerWaeponPistolAmmoMax = 10;
+	private	int			playerWeaponPistolAmmoTotal = 10;
+	private bool		playerWeaponPistolAvailable = true;
 
+	#endregion
+
+	#region Awake
 	void	Awake() {
 
 		playerCharacterController = GetComponent<CharacterController> ();
@@ -62,20 +72,22 @@ public class PlayerMovement : MonoBehaviour {
 		playerSpeedJump = 4f;
 		playerSensitivity = 2.5f;
 
-		playerTimeSlowdown = 0.1f;
+		playerTimeSlowdown = 0.01f;
 		playerTimeSlowdownDurantion = 10f;
 
-	}
+	} #endregion
 
+	#region Update
 	void	Update() {
 
-		// Input
+		#region Input
 		playerMovementHorizontal	= Input.GetAxis ("Horizontal") * playerSpeed;
-		playerMovementVertical		= Input.GetAxis ("Vertical") * playerSpeed;
+		playerMovementVertical = Input.GetAxis ("Vertical") * playerSpeed;
 
-		playerRotationHorizonal		= Input.GetAxis ("Mouse X") * playerSensitivity;
-		playerRotationVertical	   -= Input.GetAxis ("Mouse Y") * playerSensitivity;
-		playerRotationVertical		= Mathf.Clamp (playerRotationVertical, -90, 90);
+		playerRotationHorizonal = Input.GetAxis ("Mouse X") * playerSensitivity;
+		playerRotationVertical -= Input.GetAxis ("Mouse Y") * playerSensitivity;
+		playerRotationVertical = Mathf.Clamp (playerRotationVertical, -90, 90);
+		#endregion
 
 		if (playerAvailableMove) {
 
@@ -120,6 +132,15 @@ public class PlayerMovement : MonoBehaviour {
 			playerMovement = transform.rotation * (playerMovement + playerVelocity);
 			playerCharacterController.Move (playerMovement * Time.deltaTime);
 
+			// Gun
+			if (playerWeaponPistolAvailable && playerWeaponPistolAmmo > 0 && Input.GetButtonDown ("Fire1")) {
+
+				playerWeaponPistolAvailable = false;
+				playerWeaponPistolAnimator.SetTrigger ("Fire");
+				playerWeaponPistolAmmo--;
+
+			}
+
 		}
 
 		// Time
@@ -137,6 +158,7 @@ public class PlayerMovement : MonoBehaviour {
 		} else {
 
 			Time.timeScale += 1f / playerTimeSlowdownDurantion * Time.unscaledDeltaTime;
+			playerTimeText.text = "TIME SCALE : " + (Mathf.Round (100f * Time.timeScale) * 0.01f).ToString ();
 			if (Time.timeScale >= 1f) {
 
 				playerAvailableSlowdown = true;
@@ -146,8 +168,25 @@ public class PlayerMovement : MonoBehaviour {
 
 		}
 
-	}
+	} #endregion
 
+	#region FixedUpdate
+	void	FixedUpdate() {
+
+		if (!playerCharacterController.isGrounded) {
+
+			playerVelocity += Physics.gravity * Time.deltaTime;
+
+		} else {
+
+			playerVelocity = Vector3.zero;
+			playerAvailableJump = true;
+
+		}
+
+	} #endregion
+
+	#region trigger
 	void	OnTriggerEnter (Collider other) {
 
 		if(other.CompareTag("Obstacle")) {
@@ -168,69 +207,51 @@ public class PlayerMovement : MonoBehaviour {
 
 		}
 
-	}
-
-	void	FixedUpdate() {
-
-		if (!playerCharacterController.isGrounded) {
-
-			playerVelocity += Physics.gravity * Time.deltaTime;
-
-		} else {
-
-			playerVelocity = Vector3.zero;
-			playerAvailableJump = true;
-
-		}
-	
-	}
-
+	} #endregion
+		
 	private	IEnumerator	PlayObstacle(MapObstacle.Obstacle obstacle) {
-
-		float time = 0f;
 
 		playerAvailableMove = false;
 		playerUsingObstacle = true;
+		playerWeaponPistolAvailable = false;
 
 		playerCamera.gameObject.SetActive (false);
 		playerFakeCamera.gameObject.SetActive (true);
 
+		#region Obstacle Animations
 		switch(playerObstacleType) {
 			
 			case MapObstacle.Obstacle.Skip:
 				playerFakeCameraAnimator.Play ("ObstacleSkip", -1, 0f);
-				time = 1f;
-
 				break;
 
 			case MapObstacle.Obstacle.Climb3M:
 				playerFakeCameraAnimator.Play ("ObstacleClimb3M", -1, 0f);
-				time = 2f;
 				break;
 
 			case MapObstacle.Obstacle.Climb4M:
 				playerFakeCameraAnimator.Play ("ObstacleClimb4M", -1, 0f);
-				time = 2.5f;
 				break;
 
 			case MapObstacle.Obstacle.Slide:
 				playerFakeCameraAnimator.Play ("ObstacleSlide", -1, 0f);
-				time = 1f;
 				break;
 
 			case MapObstacle.Obstacle.Swing:
 				playerFakeCameraAnimator.Play ("ObstacleSwing", -1, 0f);
-				time = 2f;
 				break;
 
-		}
+		} #endregion
+
+		yield return null;
 
 		AnimatorStateInfo info = playerFakeCameraAnimator.GetCurrentAnimatorStateInfo (0);
 
-		yield return new WaitForSeconds (time);
+		yield return new WaitForSeconds (info.length);
 
 		playerAvailableMove = true;
 		playerUsingObstacle = false;
+		playerWeaponPistolAvailable = true;
 
 		transform.position = playerFakeCameraTransform.position + Vector3.down * 0.7f;
 		playerCameraTransform.rotation = playerFakeCameraTransform.rotation;
