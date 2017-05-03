@@ -54,13 +54,6 @@ public class PlayerMovement : MonoBehaviour {
 	private	bool	playerAvailableSlowdown = true;
 	public	Text	playerTimeText;
 
-	// Weapon
-	public	Animator	playerWeaponPistolAnimator;
-	private	int			playerWeaponPistolAmmo = 10;
-	private	int			playerWaeponPistolAmmoMax = 10;
-	private	int			playerWeaponPistolAmmoTotal = 10;
-	private bool		playerWeaponPistolAvailable = true;
-
 	#endregion
 
 	#region Awake
@@ -75,7 +68,8 @@ public class PlayerMovement : MonoBehaviour {
 		playerTimeSlowdown = 0.01f;
 		playerTimeSlowdownDurantion = 10f;
 
-	} #endregion
+	}
+	#endregion
 
 	#region Update
 	void	Update() {
@@ -132,15 +126,6 @@ public class PlayerMovement : MonoBehaviour {
 			playerMovement = transform.rotation * (playerMovement + playerVelocity);
 			playerCharacterController.Move (playerMovement * Time.deltaTime);
 
-			// Gun
-			if (playerWeaponPistolAvailable && playerWeaponPistolAmmo > 0 && Input.GetButtonDown ("Fire1")) {
-
-				playerWeaponPistolAvailable = false;
-				playerWeaponPistolAnimator.SetTrigger ("Fire");
-				playerWeaponPistolAmmo--;
-
-			}
-
 		}
 
 		// Time
@@ -168,7 +153,8 @@ public class PlayerMovement : MonoBehaviour {
 
 		}
 
-	} #endregion
+	}
+	#endregion
 
 	#region FixedUpdate
 	void	FixedUpdate() {
@@ -184,7 +170,8 @@ public class PlayerMovement : MonoBehaviour {
 
 		}
 
-	} #endregion
+	}
+	#endregion
 
 	#region trigger
 	void	OnTriggerEnter (Collider other) {
@@ -207,13 +194,13 @@ public class PlayerMovement : MonoBehaviour {
 
 		}
 
-	} #endregion
+	}
+	#endregion
 		
 	private	IEnumerator	PlayObstacle(MapObstacle.Obstacle obstacle) {
 
 		playerAvailableMove = false;
 		playerUsingObstacle = true;
-		playerWeaponPistolAvailable = false;
 
 		playerCamera.gameObject.SetActive (false);
 		playerFakeCamera.gameObject.SetActive (true);
@@ -241,7 +228,8 @@ public class PlayerMovement : MonoBehaviour {
 				playerFakeCameraAnimator.Play ("ObstacleSwing", -1, 0f);
 				break;
 
-		} #endregion
+		}
+		#endregion
 
 		yield return null;
 
@@ -251,7 +239,6 @@ public class PlayerMovement : MonoBehaviour {
 
 		playerAvailableMove = true;
 		playerUsingObstacle = false;
-		playerWeaponPistolAvailable = true;
 
 		transform.position = playerFakeCameraTransform.position + Vector3.down * 0.7f;
 		playerCameraTransform.rotation = playerFakeCameraTransform.rotation;
