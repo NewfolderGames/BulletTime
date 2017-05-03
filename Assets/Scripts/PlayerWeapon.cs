@@ -24,6 +24,8 @@ public class PlayerWeapon : MonoBehaviour {
 
 	private	Animator	weaponAnimator;
 
+	public	ParticleSystem	weaponShell;	
+
 	void	Awake() {
 
 		weaponAnimator = GetComponent<Animator> ();
@@ -53,6 +55,26 @@ public class PlayerWeapon : MonoBehaviour {
 
 	}
 
+	void	OnEnable() {
+
+		if (weaponAmmoCurrent != weaponAmmoMax) weaponAvailableReload = true;
+		else weaponAvailableReload = false;
+
+		weaponAvailableSight = true;
+		if (weaponNoammo) {
+
+			weaponAvailableShoot = false;
+			weaponAnimator.Play ("IdleNoammo", -1, 0f);
+
+		} else {
+
+			weaponAvailableShoot = true;
+			weaponAnimator.Play ("Idle", -1, 0f);
+
+		}
+
+	}
+
 	void	WeaponSight(bool onoff) {
 
 		if (onoff) weaponSight.localPosition = weaponSightPosition;
@@ -62,6 +84,7 @@ public class PlayerWeapon : MonoBehaviour {
 
 	IEnumerator WeaponShoot() {
 
+		weaponShell.Emit (1);
 		weaponAmmoCurrent--;
 		if (weaponAmmoCurrent <= 0) weaponNoammo = true;
 
@@ -89,11 +112,18 @@ public class PlayerWeapon : MonoBehaviour {
 		if(!weaponNoammo) yield return new WaitForSeconds (weaponTimeReload);
 		else yield return new WaitForSeconds (weaponTimeReloadNoammo);
 
-		weaponAmmoCurrent = weaponAmmoMax;
-
-		weaponAvailableReload = false;
+		weaponAvailableReload = true;
 		weaponAvailableShoot = true;
 		weaponAvailableSight = true;
+
+		weaponAmmoCurrent = weaponAmmoMax;
+		if (!weaponNoammo) { 
+			
+			weaponAmmoCurrent++;
+			weaponAvailableReload = false;
+
+		}
+
 		weaponNoammo = false;
 
 	}
