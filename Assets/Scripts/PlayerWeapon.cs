@@ -29,6 +29,9 @@ public class PlayerWeapon : MonoBehaviour {
 	public	Transform	weaponCameraTransform;
 	public	GameObject	weaponBullet;
 
+	public	AudioSource	weaponSoundSource;
+	public	AudioClip	weaponSoundShoot;
+
 	void	Awake() {
 
 		weaponAnimator = GetComponent<Animator> ();
@@ -101,6 +104,8 @@ public class PlayerWeapon : MonoBehaviour {
 		bullet.GetComponent<Rigidbody> ().AddForce (transform.forward * 100f + Vector3.up * 0.5f, ForceMode.Impulse);
 		Destroy (bullet, 15f);
 
+		weaponSoundSource.PlayOneShot (weaponSoundShoot);
+
 		yield return new WaitForSeconds (weaponTimeShoot);
 
 		weaponAvailableReload = true;
@@ -115,6 +120,7 @@ public class PlayerWeapon : MonoBehaviour {
 		weaponAvailableSight = false;
 
 		weaponAnimator.SetTrigger ("Reload");
+
 
 		if(!weaponNoammo) yield return new WaitForSeconds (weaponTimeReload);
 		else yield return new WaitForSeconds (weaponTimeReloadNoammo);
