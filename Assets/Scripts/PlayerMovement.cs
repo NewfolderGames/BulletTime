@@ -143,6 +143,7 @@ public class PlayerMovement : MonoBehaviour {
 		} else {
 
 			Time.timeScale += 1f / playerTimeSlowdownDurantion * Time.unscaledDeltaTime;
+			Time.fixedDeltaTime = Time.timeScale * 0.02f;
 			playerTimeText.text = "TIME SCALE : " + (Mathf.Round (100f * Time.timeScale) * 0.01f).ToString ();
 			if (Time.timeScale >= 1f) {
 

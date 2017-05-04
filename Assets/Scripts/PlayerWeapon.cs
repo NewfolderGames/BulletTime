@@ -15,7 +15,7 @@ public class PlayerWeapon : MonoBehaviour {
 	public	bool	weaponSemiauto;
 
 	private	bool	weaponAvailableShoot = true;
-	private	bool	weaponAvailableReload;
+	private	bool	weaponAvailableReload = true;
 	private bool	weaponAvailableSight = true;
 	private	bool	weaponNoammo;
 
@@ -25,6 +25,9 @@ public class PlayerWeapon : MonoBehaviour {
 	private	Animator	weaponAnimator;
 
 	public	ParticleSystem	weaponShell;	
+
+	public	Transform	weaponCameraTransform;
+	public	GameObject	weaponBullet;
 
 	void	Awake() {
 
@@ -93,6 +96,10 @@ public class PlayerWeapon : MonoBehaviour {
 
 		if (weaponNoammo) weaponAnimator.SetTrigger ("FireNoammo");
 		else weaponAnimator.SetTrigger ("Fire");
+
+		GameObject bullet = Instantiate (weaponBullet, weaponCameraTransform.position, weaponCameraTransform.rotation);
+		bullet.GetComponent<Rigidbody> ().AddForce (transform.forward * 100f + Vector3.up * 0.5f, ForceMode.Impulse);
+		Destroy (bullet, 15f);
 
 		yield return new WaitForSeconds (weaponTimeShoot);
 
