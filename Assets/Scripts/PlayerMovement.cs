@@ -9,6 +9,7 @@ public class PlayerMovement : MonoBehaviour {
 
 	// Component
 	private	CharacterController playerCharacterController;
+	private	AudioSource			playerAudioSource;
 
 	// Camera
 	public	Camera		playerCamera;
@@ -60,6 +61,7 @@ public class PlayerMovement : MonoBehaviour {
 	void	Awake() {
 
 		playerCharacterController = GetComponent<CharacterController> ();
+		playerAudioSource = GetComponent<AudioSource> ();
 
 		playerSpeed = 5f;
 		playerSpeedJump = 4f;
@@ -136,6 +138,7 @@ public class PlayerMovement : MonoBehaviour {
 				playerAvailableSlowdown = false;
 				Time.timeScale = playerTimeSlowdown;
 				Time.fixedDeltaTime = Time.timeScale * 0.02f;
+				playerAudioSource.pitch = Time.timeScale;
 				Debug.Log ("aayy");
 
 			}
@@ -144,9 +147,13 @@ public class PlayerMovement : MonoBehaviour {
 
 			Time.timeScale += 1f / playerTimeSlowdownDurantion * Time.unscaledDeltaTime;
 			Time.fixedDeltaTime = Time.timeScale * 0.02f;
+			playerAudioSource.pitch = Time.timeScale;
 			playerTimeText.text = "TIME SCALE : " + (Mathf.Round (100f * Time.timeScale) * 0.01f).ToString ();
 			if (Time.timeScale >= 1f) {
 
+				Time.timeScale = 1f;
+				Time.fixedDeltaTime = 0.02f;
+				playerAudioSource.pitch = 1f;
 				playerAvailableSlowdown = true;
 				return;
 
