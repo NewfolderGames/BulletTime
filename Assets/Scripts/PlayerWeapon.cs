@@ -20,6 +20,8 @@ public class PlayerWeapon : MonoBehaviour {
 	private bool	weaponAvailableSight = true;
 	private	bool	weaponNoammo;
 
+	public	int		weaponDamage;
+
 	public	Transform	weaponSight;
 	public	Vector3		weaponSightPosition;
 
@@ -27,7 +29,8 @@ public class PlayerWeapon : MonoBehaviour {
 
 	private	Animator	weaponAnimator;
 
-	public	ParticleSystem	weaponShell;	
+	public	ParticleSystem	weaponShell;
+	public	Vector3			weaponShellPosition;
 
 	public	Transform	weaponCameraTransform;
 	public	GameObject	weaponBullet;
@@ -84,6 +87,8 @@ public class PlayerWeapon : MonoBehaviour {
 
 		}
 
+		weaponShell.transform.localPosition = weaponShellPosition;
+
 	}
 
 	void	WeaponSight(bool onoff) {
@@ -108,6 +113,7 @@ public class PlayerWeapon : MonoBehaviour {
 
 		GameObject bullet = Instantiate (weaponBullet, weaponCameraTransform.position, weaponCameraTransform.rotation);
 		bullet.GetComponent<Rigidbody> ().AddForce (transform.forward * 7.5f + Vector3.up * 0.125f, ForceMode.Impulse);
+		bullet.GetComponent<Bullet> ().damage = weaponDamage;
 		Destroy (bullet, 15f);
 
 		weaponSoundSource.PlayOneShot (weaponSoundShoot);
