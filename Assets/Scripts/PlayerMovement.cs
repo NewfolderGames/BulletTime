@@ -144,7 +144,7 @@ public class PlayerMovement : MonoBehaviour {
 			}
 
 		} else {
-
+			
 			Time.timeScale += 1f / playerTimeSlowdownDurantion * Time.unscaledDeltaTime;
 			Time.fixedDeltaTime = Time.timeScale * 0.02f;
 			playerAudioSource.pitch = Time.timeScale;

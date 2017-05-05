@@ -120,8 +120,7 @@ public class PlayerWeapon : MonoBehaviour {
 		weaponAvailableSight = false;
 
 		weaponAnimator.SetTrigger ("Reload");
-
-
+	
 		if(!weaponNoammo) yield return new WaitForSeconds (weaponTimeReload);
 		else yield return new WaitForSeconds (weaponTimeReloadNoammo);
 
