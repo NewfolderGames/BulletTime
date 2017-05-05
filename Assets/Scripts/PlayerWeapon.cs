@@ -40,6 +40,8 @@ public class PlayerWeapon : MonoBehaviour {
 
 	void	Update() {
 
+		weaponAnimator.SetFloat ("Speed", 1f / Time.timeScale);
+
 		if (weaponAvailableShoot) {
 
 			if ((Input.GetButton ("Fire1") && !weaponSemiauto) || (Input.GetButtonDown ("Fire1") && weaponSemiauto)) {
@@ -101,7 +103,7 @@ public class PlayerWeapon : MonoBehaviour {
 		else weaponAnimator.SetTrigger ("Fire");
 
 		GameObject bullet = Instantiate (weaponBullet, weaponCameraTransform.position, weaponCameraTransform.rotation);
-		bullet.GetComponent<Rigidbody> ().AddForce (transform.forward * 100f + Vector3.up * 0.5f, ForceMode.Impulse);
+		bullet.GetComponent<Rigidbody> ().AddForce (transform.forward * 10f + Vector3.up * 0f, ForceMode.Impulse);
 		Destroy (bullet, 15f);
 
 		weaponSoundSource.PlayOneShot (weaponSoundShoot);
@@ -121,8 +123,8 @@ public class PlayerWeapon : MonoBehaviour {
 
 		weaponAnimator.SetTrigger ("Reload");
 	
-		if(!weaponNoammo) yield return new WaitForSeconds (weaponTimeReload);
-		else yield return new WaitForSeconds (weaponTimeReloadNoammo);
+		if(!weaponNoammo) yield return new WaitForSecondsRealtime (weaponTimeReload);
+		else yield return new WaitForSecondsRealtime (weaponTimeReloadNoammo);
 
 		weaponAvailableReload = true;
 		weaponAvailableShoot = true;

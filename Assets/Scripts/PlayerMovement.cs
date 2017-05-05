@@ -75,8 +75,9 @@ public class PlayerMovement : MonoBehaviour {
 	void	Update() {
 
 		#region Input
-		playerMovementHorizontal	= Input.GetAxis ("Horizontal") * playerSpeed;
-		playerMovementVertical = Input.GetAxis ("Vertical") * playerSpeed;
+		playerMovementHorizontal = Input.GetAxisRaw ("Horizontal") * playerSpeed;
+		playerMovementVertical = Input.GetAxisRaw ("Vertical") * playerSpeed;
+		bool moved = playerMovementHorizontal != 0 || playerMovementVertical != 0;
 
 		playerRotationHorizonal = Input.GetAxis ("Mouse X") * playerSensitivity;
 		playerRotationVertical -= Input.GetAxis ("Mouse Y") * playerSensitivity;
@@ -124,13 +125,16 @@ public class PlayerMovement : MonoBehaviour {
 			// Movement
 			playerMovement.Set (playerMovementHorizontal, 0f, playerMovementVertical);
 			playerMovement = transform.rotation * (playerMovement + playerVelocity);
-			playerCharacterController.Move (playerMovement * Time.deltaTime);
+			playerCharacterController.Move (playerMovement * Time.unscaledDeltaTime);
 
 			// Time
 			Time.timeScale = 1f / ((playerCharacterController.velocity.magnitude * 2f * Time.timeScale) + 1f);
 			Time.fixedDeltaTime = Time.timeScale * 0.02f;
 			playerAudioSource.pitch = Time.timeScale;
-			playerSpeed = playerSpeedBase / Time.timeScale;
+
+			if (!moved) {
+				Debug.Log (playerCharacterController.velocity.ToString ());
+			}
 
 		}
 
@@ -142,7 +146,7 @@ public class PlayerMovement : MonoBehaviour {
 
 		if (!playerCharacterController.isGrounded) {
 
-			playerVelocity += Physics.gravity * Time.deltaTime / Time.timeScale;
+			playerVelocity += Physics.gravity * Time.unscaledDeltaTime;
 
 		} else {
 
