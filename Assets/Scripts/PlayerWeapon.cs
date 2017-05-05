@@ -103,7 +103,7 @@ public class PlayerWeapon : MonoBehaviour {
 		else weaponAnimator.SetTrigger ("Fire");
 
 		GameObject bullet = Instantiate (weaponBullet, weaponCameraTransform.position, weaponCameraTransform.rotation);
-		bullet.GetComponent<Rigidbody> ().AddForce (transform.forward * 10f + Vector3.up * 0f, ForceMode.Impulse);
+		bullet.GetComponent<Rigidbody> ().AddForce (transform.forward * 7.5f + Vector3.up * 0.125f, ForceMode.Impulse);
 		Destroy (bullet, 15f);
 
 		weaponSoundSource.PlayOneShot (weaponSoundShoot);

@@ -28,9 +28,7 @@ public class PlayerMovement : MonoBehaviour {
 	private	Vector3	playerVelocity;
 
 	private	float	playerSpeed;
-	private	float	playerSpeedBase;
 	private	float	playerSpeedJump;
-	private	float	playerSpeedBaseJump;
 
 	private	float	playerMovementHorizontal;
 	private	float	playerMovementVertical;
@@ -52,6 +50,7 @@ public class PlayerMovement : MonoBehaviour {
 
 	// Time
 	public	Text	playerTimeText;
+	private	float	playerTimeSlow;
 
 	#endregion
 
@@ -61,10 +60,8 @@ public class PlayerMovement : MonoBehaviour {
 		playerCharacterController = GetComponent<CharacterController> ();
 		playerAudioSource = GetComponent<AudioSource> ();
 
-		playerSpeed = 5f;
+		playerSpeed = 3f;
 		playerSpeedJump = 4f;
-		playerSpeedBase = 5f;
-		playerSpeedBaseJump = 4f;
 
 		playerSensitivity = 2.5f;
 
@@ -128,13 +125,17 @@ public class PlayerMovement : MonoBehaviour {
 			playerCharacterController.Move (playerMovement * Time.unscaledDeltaTime);
 
 			// Time
-			Time.timeScale = 1f / ((playerCharacterController.velocity.magnitude * 2f * Time.timeScale) + 1f);
+			//playerTimeSlow = 1f / ((playerCharacterController.velocity.magnitude * 2f * Time.timeScale) + 1f);
+
+			if (moved) playerTimeSlow -= 100f * Time.unscaledDeltaTime * 0.5f;
+			else playerTimeSlow += 100f * Time.unscaledDeltaTime;
+			playerTimeSlow = Mathf.Clamp (playerTimeSlow, 0, 100);
+
+			Time.timeScale = Mathf.Round(playerTimeSlow * 0.9f + 10) / 100f;
 			Time.fixedDeltaTime = Time.timeScale * 0.02f;
 			playerAudioSource.pitch = Time.timeScale;
-
-			if (!moved) {
-				Debug.Log (playerCharacterController.velocity.ToString ());
-			}
+			playerTimeText.text = "SPEED\n" + Time.timeScale;
+			playerTimeText.color = Color.Lerp (Color.red, Color.white, playerTimeSlow / 100);
 
 		}
 
