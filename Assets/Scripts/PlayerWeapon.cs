@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerWeapon : MonoBehaviour {
 
@@ -21,6 +22,8 @@ public class PlayerWeapon : MonoBehaviour {
 
 	public	Transform	weaponSight;
 	public	Vector3		weaponSightPosition;
+
+	public	Text		weaponAmmoText;
 
 	private	Animator	weaponAnimator;
 
@@ -94,6 +97,7 @@ public class PlayerWeapon : MonoBehaviour {
 
 		weaponShell.Emit (1);
 		weaponAmmoCurrent--;
+		WeaponAmmoText ();
 		if (weaponAmmoCurrent <= 0) weaponNoammo = true;
 
 		weaponAvailableReload = false;
@@ -139,6 +143,14 @@ public class PlayerWeapon : MonoBehaviour {
 		}
 
 		weaponNoammo = false;
+		WeaponAmmoText ();
+
+	}
+
+	private	void	WeaponAmmoText() {
+
+		if (weaponAmmoCurrent <= weaponAmmoMax) weaponAmmoText.text = weaponAmmoCurrent.ToString();
+		else weaponAmmoText.text = (weaponAmmoCurrent - 1).ToString() + " + 1";
 
 	}
 
