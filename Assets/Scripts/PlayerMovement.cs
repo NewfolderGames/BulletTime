@@ -28,7 +28,9 @@ public class PlayerMovement : MonoBehaviour {
 	private	Vector3	playerVelocity;
 
 	private	float	playerSpeed;
+	private	float	playerSpeedBase;
 	private	float	playerSpeedJump;
+	private	float	playerSpeedBaseJump;
 
 	private	float	playerMovementHorizontal;
 	private	float	playerMovementVertical;
@@ -41,7 +43,6 @@ public class PlayerMovement : MonoBehaviour {
 	private	MapObstacle				playerObstacle;
 
 	private	bool	playerAvailableObstacle;
-	private	bool	playerUsingObstacle;
 
 	// Rotation
 	private	float	playerSensitivity;
@@ -50,9 +51,6 @@ public class PlayerMovement : MonoBehaviour {
 	private	float	playerRotationVertical;
 
 	// Time
-	private	float	playerTimeSlowdown;
-	private	float	playerTimeSlowdownDurantion;
-	private	bool	playerAvailableSlowdown = true;
 	public	Text	playerTimeText;
 
 	#endregion
@@ -65,10 +63,10 @@ public class PlayerMovement : MonoBehaviour {
 
 		playerSpeed = 5f;
 		playerSpeedJump = 4f;
-		playerSensitivity = 2.5f;
+		playerSpeedBase = 5f;
+		playerSpeedBaseJump = 4f;
 
-		playerTimeSlowdown = 0.01f;
-		playerTimeSlowdownDurantion = 10f;
+		playerSensitivity = 2.5f;
 
 	}
 	#endregion
@@ -128,36 +126,11 @@ public class PlayerMovement : MonoBehaviour {
 			playerMovement = transform.rotation * (playerMovement + playerVelocity);
 			playerCharacterController.Move (playerMovement * Time.deltaTime);
 
-		}
-
-		// Time
-		if (playerAvailableSlowdown) {
-
-			if (Input.GetMouseButtonDown (2)) {
-
-				playerAvailableSlowdown = false;
-				Time.timeScale = playerTimeSlowdown;
-				Time.fixedDeltaTime = Time.timeScale * 0.02f;
-				playerAudioSource.pitch = Time.timeScale;
-				Debug.Log ("aayy");
-
-			}
-
-		} else {
-			
-			Time.timeScale += 1f / playerTimeSlowdownDurantion * Time.unscaledDeltaTime;
+			// Time
+			Time.timeScale = 1f / ((playerCharacterController.velocity.magnitude * 2f * Time.timeScale) + 1f);
 			Time.fixedDeltaTime = Time.timeScale * 0.02f;
 			playerAudioSource.pitch = Time.timeScale;
-			playerTimeText.text = "TIME SCALE : " + (Mathf.Round (100f * Time.timeScale) * 0.01f).ToString ();
-			if (Time.timeScale >= 1f) {
-
-				Time.timeScale = 1f;
-				Time.fixedDeltaTime = 0.02f;
-				playerAudioSource.pitch = 1f;
-				playerAvailableSlowdown = true;
-				return;
-
-			}
+			playerSpeed = playerSpeedBase / Time.timeScale;
 
 		}
 
@@ -169,7 +142,7 @@ public class PlayerMovement : MonoBehaviour {
 
 		if (!playerCharacterController.isGrounded) {
 
-			playerVelocity += Physics.gravity * Time.deltaTime;
+			playerVelocity += Physics.gravity * Time.deltaTime / Time.timeScale;
 
 		} else {
 
@@ -207,46 +180,27 @@ public class PlayerMovement : MonoBehaviour {
 		
 	private	IEnumerator	PlayObstacle(MapObstacle.Obstacle obstacle) {
 
+		float time = 1f;
+
 		playerAvailableMove = false;
-		playerUsingObstacle = true;
 
 		playerCamera.gameObject.SetActive (false);
 		playerFakeCamera.gameObject.SetActive (true);
 
-		#region Obstacle Animations
 		switch(playerObstacleType) {
 			
-			case MapObstacle.Obstacle.Skip:
-				playerFakeCameraAnimator.Play ("ObstacleSkip", -1, 0f);
-				break;
-
-			case MapObstacle.Obstacle.Climb3M:
-				playerFakeCameraAnimator.Play ("ObstacleClimb3M", -1, 0f);
-				break;
-
-			case MapObstacle.Obstacle.Climb4M:
-				playerFakeCameraAnimator.Play ("ObstacleClimb4M", -1, 0f);
-				break;
-
-			case MapObstacle.Obstacle.Slide:
-				playerFakeCameraAnimator.Play ("ObstacleSlide", -1, 0f);
-				break;
-
-			case MapObstacle.Obstacle.Swing:
-				playerFakeCameraAnimator.Play ("ObstacleSwing", -1, 0f);
-				break;
+			case MapObstacle.Obstacle.Skip : time = 1f;	break;
+			case MapObstacle.Obstacle.Climb3M : time = 2f; break;
+			case MapObstacle.Obstacle.Climb4M : time = 2.5f; break;
+			case MapObstacle.Obstacle.Slide : time = 1f; break;
 
 		}
-		#endregion
+		playerFakeCameraAnimator.SetInteger ("Index", (int)playerObstacleType);
+		playerFakeCameraAnimator.SetFloat ("Speed", 1f / Time.timeScale);
 
-		yield return null;
-
-		AnimatorStateInfo info = playerFakeCameraAnimator.GetCurrentAnimatorStateInfo (0);
-
-		yield return new WaitForSeconds (info.length);
+		yield return new WaitForSeconds (time * Time.timeScale);
 
 		playerAvailableMove = true;
-		playerUsingObstacle = false;
 
 		transform.position = playerFakeCameraTransform.position + Vector3.down * 0.7f;
 		playerCameraTransform.rotation = playerFakeCameraTransform.rotation;
