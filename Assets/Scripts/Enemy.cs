@@ -63,12 +63,14 @@ public class Enemy : MonoBehaviour {
 		enemyHealth -= damage;
 		if (enemyHealth <= 0) {
 
-			enemyWeaponTransform.gameObject.GetComponent<Rigidbody> ().isKinematic = false;
+			Rigidbody weaponRigidbody = enemyWeaponTransform.gameObject.GetComponent<Rigidbody> ();
+			weaponRigidbody.isKinematic = false;
+			weaponRigidbody.AddForce ((Vector3.forward + Vector3.up) * Random.Range (-2.5f, 2.5f), ForceMode.Impulse);
+			weaponRigidbody.AddTorque ((Vector3.right + Vector3.up + Vector3.forward) * Random.Range (-2.5f, 2.5f), ForceMode.Impulse);
 			enemyWeaponTransform.SetParent (null);
 			enemyNavMeshAgent.enabled = false;
 			gameObject.layer = LayerMask.NameToLayer ("Corpe");
 			this.enabled = false;
-			//Destroy (gameObject);
 
 		}
 

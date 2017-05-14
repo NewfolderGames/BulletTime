@@ -56,8 +56,6 @@ public class PlayerMovement : MonoBehaviour {
 	public	Text	playerTimeText;
 	private	float	playerTimeSlow;
 
-
-
 	#endregion
 
 	#region Awake
