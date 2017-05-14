@@ -39,13 +39,16 @@ public class Enemy : MonoBehaviour {
 			enemyNavMeshAgent.SetDestination (enemyTargetTransform.position);
 
 			Quaternion rotation = Quaternion.LookRotation (enemyTargetTransform.position - enemyWeaponTransform.position);
-			enemyWeaponTransform.rotation = Quaternion.Slerp (enemyWeaponTransform.rotation, rotation, Time.deltaTime * 2.5f);
+			enemyWeaponTransform.rotation = Quaternion.Slerp (enemyWeaponTransform.rotation, rotation, Time.deltaTime * 5f);
 
 			if (enemyWeaponAvailableShoot) {
-				
-				if (Physics.Raycast (enemyWeaponTransform.position, enemyWeaponTransform.forward, 25f, LayerMask.GetMask ("Player"))) {
 
-					StartCoroutine (EnemyShoot ());
+				RaycastHit rayhit;
+				if (Physics.Raycast (enemyWeaponTransform.position, enemyWeaponTransform.forward, out rayhit, 25f)) {
+
+					if (rayhit.collider.CompareTag("Player")) {
+						StartCoroutine (EnemyShoot ());
+					}
 
 				}
 

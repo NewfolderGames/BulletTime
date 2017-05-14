@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.PostProcessing;
 
 public class PlayerMovement : MonoBehaviour {
 
@@ -19,6 +20,9 @@ public class PlayerMovement : MonoBehaviour {
 	public	Transform	playerFakeCameraTransform;
 
 	public	Animator	playerFakeCameraAnimator;
+
+	public	PostProcessingBehaviour	playerCameraPost;
+	public	PostProcessingBehaviour	playerFakeCameraPost;
 
 	// Animation
 	public	AnimationClip[]	playerObstacleAnimations;
@@ -51,6 +55,8 @@ public class PlayerMovement : MonoBehaviour {
 	// Time
 	public	Text	playerTimeText;
 	private	float	playerTimeSlow;
+
+
 
 	#endregion
 
