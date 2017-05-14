@@ -125,9 +125,7 @@ public class PlayerMovement : MonoBehaviour {
 			playerCharacterController.Move (playerMovement * Time.unscaledDeltaTime);
 
 			// Time
-			//playerTimeSlow = 1f / ((playerCharacterController.velocity.magnitude * 2f * Time.timeScale) + 1f);
-
-			if (moved) playerTimeSlow -= 100f * Time.unscaledDeltaTime * 0.5f;
+			if (moved) playerTimeSlow -= 100f * Time.unscaledDeltaTime * 0.4f;
 			else playerTimeSlow += 100f * Time.unscaledDeltaTime;
 			playerTimeSlow = Mathf.Clamp (playerTimeSlow, 0, 100);
 

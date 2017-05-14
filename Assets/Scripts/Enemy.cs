@@ -10,9 +10,14 @@ public class Enemy : MonoBehaviour {
 	private	GameObject	enemyTarget;
 	private	Transform	enemyTargetTransform;
 
-	public	Transform	enemyWeaponTransform;
-
 	public	int	enemyHealth = 10;
+
+	public	Transform	enemyWeaponTransform;
+	public	GameObject	enemyWeaponBullet;
+	public	AudioClip	enemyWeaponSound;
+	private	bool	enemyWeaponAvailableShoot = true;
+	private float	enemyWeaponShootDelay = 0.25f;
+	private	int		enemyWeaponDamage = 5;
 
 	void Awake() {
 
@@ -33,6 +38,18 @@ public class Enemy : MonoBehaviour {
 
 			enemyNavMeshAgent.SetDestination (enemyTargetTransform.position);
 
+			Quaternion rotation = Quaternion.LookRotation (enemyTargetTransform.position - enemyWeaponTransform.position);
+			enemyWeaponTransform.rotation = Quaternion.Slerp (enemyWeaponTransform.rotation, rotation, Time.deltaTime * 2.5f);
+
+			if (enemyWeaponAvailableShoot) {
+				
+				if (Physics.Raycast (enemyWeaponTransform.position, enemyWeaponTransform.forward, 25f, LayerMask.GetMask ("Player"))) {
+
+					StartCoroutine (EnemyShoot ());
+
+				}
+
+			}
 
 		}
 
@@ -46,6 +63,22 @@ public class Enemy : MonoBehaviour {
 			Destroy (gameObject);
 
 		}
+
+	}
+
+	private	IEnumerator	EnemyShoot() {
+
+		enemyWeaponAvailableShoot = false;
+
+		GameObject bullet = Instantiate (enemyWeaponBullet, enemyWeaponTransform.position, enemyWeaponTransform.rotation);
+		bullet.GetComponent<Rigidbody> ().AddForce (enemyWeaponTransform.forward * 7.5f + Vector3.up * 0.125f, ForceMode.Impulse);
+		bullet.GetComponent<Bullet> ().damage = enemyWeaponDamage;
+
+		enemyTarget.GetComponent<AudioSource> ().PlayOneShot (enemyWeaponSound);
+
+		yield return new WaitForSeconds (enemyWeaponShootDelay);
+
+		enemyWeaponAvailableShoot = true;
 
 	}
 
