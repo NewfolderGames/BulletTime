@@ -64,7 +64,7 @@ public class PlayerMovement : MonoBehaviour {
 		playerCharacterController = GetComponent<CharacterController> ();
 		playerAudioSource = GetComponent<AudioSource> ();
 
-		playerSpeed = 3f;
+		playerSpeed = 4f;
 		playerSpeedJump = 4f;
 
 		playerSensitivity = 2.5f;

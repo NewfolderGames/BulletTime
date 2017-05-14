@@ -68,8 +68,10 @@ public class Enemy : MonoBehaviour {
 			weaponRigidbody.AddForce ((Vector3.forward + Vector3.up) * Random.Range (-2.5f, 2.5f), ForceMode.Impulse);
 			weaponRigidbody.AddTorque ((Vector3.right + Vector3.up + Vector3.forward) * Random.Range (-2.5f, 2.5f), ForceMode.Impulse);
 			enemyWeaponTransform.SetParent (null);
+			enemyWeaponTransform.gameObject.layer = LayerMask.NameToLayer ("Corpse");
+
 			enemyNavMeshAgent.enabled = false;
-			gameObject.layer = LayerMask.NameToLayer ("Corpe");
+			gameObject.layer = LayerMask.NameToLayer ("Corpse");
 			this.enabled = false;
 
 		}
