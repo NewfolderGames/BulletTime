@@ -16,8 +16,8 @@ public class Enemy : MonoBehaviour {
 	public	GameObject	enemyWeaponBullet;
 	public	AudioClip	enemyWeaponSound;
 	private	bool	enemyWeaponAvailableShoot = true;
-	private float	enemyWeaponShootDelay = 0.25f;
-	private	int		enemyWeaponDamage = 5;
+	public float	enemyWeaponShootDelay = 0.25f;
+	public	int		enemyWeaponDamage = 5;
 
 	void Awake() {
 
@@ -38,7 +38,7 @@ public class Enemy : MonoBehaviour {
 
 			enemyNavMeshAgent.SetDestination (enemyTargetTransform.position);
 
-			Quaternion rotation = Quaternion.LookRotation (enemyTargetTransform.position - enemyWeaponTransform.position);
+			Quaternion rotation = Quaternion.LookRotation (enemyTargetTransform.position - enemyWeaponTransform.position + Vector3.up * 0.5f);
 			enemyWeaponTransform.rotation = Quaternion.Slerp (enemyWeaponTransform.rotation, rotation, Time.deltaTime * 5f);
 
 			if (enemyWeaponAvailableShoot) {
