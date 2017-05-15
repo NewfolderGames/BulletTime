@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour {
 
 	void Awake() {
 
+		gameEnemyNumber = 0;
 		gameTextEnemy = GameObject.Find ("EnemyNumber").GetComponent<Text>();
 
 	}
@@ -30,6 +31,7 @@ public class GameManager : MonoBehaviour {
 	public	static	void	TextUpdateEnemy() {
 
 		gameTextEnemy.text = "ENEMY\n" + gameEnemyNumber.ToString ();
+		//GameObject.Find ("EnemyNumber").GetComponent<Text>().text = "ENEMY\n" + gameEnemyNumber.ToString ();
 
 	}
 

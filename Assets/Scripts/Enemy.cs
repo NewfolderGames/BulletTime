@@ -19,19 +19,15 @@ public class Enemy : MonoBehaviour {
 	public float	enemyWeaponShootDelay = 0.25f;
 	public	int		enemyWeaponDamage = 5;
 
-	void Awake() {
-
-		GameManager.gameEnemyNumber++;
-		GameManager.TextUpdateEnemy ();
-
-	}
-
 	void Start () {
 
 		enemyNavMeshAgent = GetComponent<NavMeshAgent> ();
 
 		enemyTarget = GameObject.Find ("Player");
 		enemyTargetTransform = enemyTarget.transform;
+
+		GameManager.gameEnemyNumber++;
+		GameManager.TextUpdateEnemy ();
 
 	}
 
