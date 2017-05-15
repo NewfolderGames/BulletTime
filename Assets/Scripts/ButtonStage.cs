@@ -6,8 +6,11 @@ using UnityEngine.SceneManagement;
 public class ButtonStage : MonoBehaviour {
 
 	public	string	buttonSceneName;
+	public	int		buttonStageNumber;
 
 	public	void	Enter() {
+
+		GameManager.gameStageNumber = buttonStageNumber;
 
 		SceneManager.LoadScene (buttonSceneName);
 

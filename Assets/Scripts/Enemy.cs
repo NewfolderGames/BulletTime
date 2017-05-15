@@ -43,7 +43,7 @@ public class Enemy : MonoBehaviour {
 			if (enemyWeaponAvailableShoot) {
 
 				RaycastHit rayhit;
-				if (Physics.Raycast (enemyWeaponTransform.position, enemyWeaponTransform.forward, out rayhit, 25f)) {
+				if (Physics.Raycast (enemyWeaponTransform.position, enemyWeaponTransform.forward, out rayhit, 100f)) {
 
 					if (rayhit.collider.CompareTag("Player")) {
 						StartCoroutine (EnemyShoot ());

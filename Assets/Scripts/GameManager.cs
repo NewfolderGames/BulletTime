@@ -2,13 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour {
 
-	public	static	int		gameLevel;
+	public	static	int		gameStageNumber;
 	public	static	int		gameEnemyNumber;
 
+	public	bool	gameClear;
+
 	public	static	Text	gameTextEnemy;
+	public	Text	gameTextSpeed;
+	public	Text	gameTextClear;
 
 	void Awake() {
 
@@ -25,7 +30,28 @@ public class GameManager : MonoBehaviour {
 	}
 
 	void Update () {
-		
+
+		if (!gameClear && gameEnemyNumber <= 0) {
+			
+			StartCoroutine (Clear ());
+
+		}
+
+	}
+
+	IEnumerator Clear() {
+
+		gameTextEnemy.gameObject.SetActive (false);
+		gameTextSpeed.gameObject.SetActive (false);
+		gameTextClear.gameObject.SetActive (true);
+
+		yield return new WaitForSecondsRealtime (5);
+
+		Cursor.lockState = CursorLockMode.None;
+		Cursor.visible = true;
+
+		SceneManager.LoadScene ("Main");
+
 	}
 
 	public	static	void	TextUpdateEnemy() {
