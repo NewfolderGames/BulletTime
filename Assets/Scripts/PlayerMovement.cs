@@ -67,7 +67,7 @@ public class PlayerMovement : MonoBehaviour {
 		playerSpeed = 4f;
 		playerSpeedJump = 4f;
 
-		playerSensitivity = 2.5f;
+		playerSensitivity = 75f;
 
 	}
 	#endregion
@@ -80,8 +80,8 @@ public class PlayerMovement : MonoBehaviour {
 		playerMovementVertical = Input.GetAxisRaw ("Vertical") * playerSpeed;
 		bool moved = playerMovementHorizontal != 0 || playerMovementVertical != 0;
 
-		playerRotationHorizonal = Input.GetAxis ("Mouse X") * playerSensitivity;
-		playerRotationVertical -= Input.GetAxis ("Mouse Y") * playerSensitivity;
+		playerRotationHorizonal = Input.GetAxis ("Mouse X") * playerSensitivity * Time.unscaledDeltaTime;
+		playerRotationVertical -= Input.GetAxis ("Mouse Y") * playerSensitivity * Time.unscaledDeltaTime;
 		playerRotationVertical = Mathf.Clamp (playerRotationVertical, -90, 90);
 		#endregion
 

@@ -21,6 +21,9 @@ public class Enemy : MonoBehaviour {
 
 	void Awake() {
 
+		GameManager.gameEnemyNumber++;
+		GameManager.TextUpdateEnemy ();
+
 	}
 
 	void Start () {
@@ -72,6 +75,10 @@ public class Enemy : MonoBehaviour {
 
 			enemyNavMeshAgent.enabled = false;
 			gameObject.layer = LayerMask.NameToLayer ("Corpse");
+
+			GameManager.gameEnemyNumber--;
+			GameManager.TextUpdateEnemy ();
+
 			this.enabled = false;
 
 		}
