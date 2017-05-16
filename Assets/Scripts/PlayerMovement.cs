@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.PostProcessing;
 
 public class PlayerMovement : MonoBehaviour {
 
@@ -19,6 +20,9 @@ public class PlayerMovement : MonoBehaviour {
 	public	Transform	playerFakeCameraTransform;
 
 	public	Animator	playerFakeCameraAnimator;
+
+	public	PostProcessingBehaviour	playerCameraPost;
+	public	PostProcessingBehaviour	playerFakeCameraPost;
 
 	// Animation
 	public	AnimationClip[]	playerObstacleAnimations;
@@ -41,7 +45,6 @@ public class PlayerMovement : MonoBehaviour {
 	private	MapObstacle				playerObstacle;
 
 	private	bool	playerAvailableObstacle;
-	private	bool	playerUsingObstacle;
 
 	// Rotation
 	private	float	playerSensitivity;
@@ -50,10 +53,8 @@ public class PlayerMovement : MonoBehaviour {
 	private	float	playerRotationVertical;
 
 	// Time
-	private	float	playerTimeSlowdown;
-	private	float	playerTimeSlowdownDurantion;
-	private	bool	playerAvailableSlowdown = true;
 	public	Text	playerTimeText;
+	private	float	playerTimeSlow;
 
 	#endregion
 
@@ -63,12 +64,10 @@ public class PlayerMovement : MonoBehaviour {
 		playerCharacterController = GetComponent<CharacterController> ();
 		playerAudioSource = GetComponent<AudioSource> ();
 
-		playerSpeed = 5f;
+		playerSpeed = 4f;
 		playerSpeedJump = 4f;
-		playerSensitivity = 2.5f;
 
-		playerTimeSlowdown = 0.01f;
-		playerTimeSlowdownDurantion = 10f;
+		playerSensitivity = 75f;
 
 	}
 	#endregion
@@ -77,11 +76,12 @@ public class PlayerMovement : MonoBehaviour {
 	void	Update() {
 
 		#region Input
-		playerMovementHorizontal	= Input.GetAxis ("Horizontal") * playerSpeed;
-		playerMovementVertical = Input.GetAxis ("Vertical") * playerSpeed;
+		playerMovementHorizontal = Input.GetAxisRaw ("Horizontal") * playerSpeed;
+		playerMovementVertical = Input.GetAxisRaw ("Vertical") * playerSpeed;
+		bool moved = playerMovementHorizontal != 0 || playerMovementVertical != 0;
 
-		playerRotationHorizonal = Input.GetAxis ("Mouse X") * playerSensitivity;
-		playerRotationVertical -= Input.GetAxis ("Mouse Y") * playerSensitivity;
+		playerRotationHorizonal = Input.GetAxis ("Mouse X") * playerSensitivity * Time.unscaledDeltaTime;
+		playerRotationVertical -= Input.GetAxis ("Mouse Y") * playerSensitivity * Time.unscaledDeltaTime;
 		playerRotationVertical = Mathf.Clamp (playerRotationVertical, -90, 90);
 		#endregion
 
@@ -126,38 +126,18 @@ public class PlayerMovement : MonoBehaviour {
 			// Movement
 			playerMovement.Set (playerMovementHorizontal, 0f, playerMovementVertical);
 			playerMovement = transform.rotation * (playerMovement + playerVelocity);
-			playerCharacterController.Move (playerMovement * Time.deltaTime);
+			playerCharacterController.Move (playerMovement * Time.unscaledDeltaTime);
 
-		}
+			// Time
+			if (moved) playerTimeSlow -= 100f * Time.unscaledDeltaTime * 0.4f;
+			else playerTimeSlow += 100f * Time.unscaledDeltaTime;
+			playerTimeSlow = Mathf.Clamp (playerTimeSlow, 0, 100);
 
-		// Time
-		if (playerAvailableSlowdown) {
-
-			if (Input.GetMouseButtonDown (2)) {
-
-				playerAvailableSlowdown = false;
-				Time.timeScale = playerTimeSlowdown;
-				Time.fixedDeltaTime = Time.timeScale * 0.02f;
-				playerAudioSource.pitch = Time.timeScale;
-				Debug.Log ("aayy");
-
-			}
-
-		} else {
-			
-			Time.timeScale += 1f / playerTimeSlowdownDurantion * Time.unscaledDeltaTime;
+			Time.timeScale = Mathf.Round(playerTimeSlow * 0.9f + 10) / 100f;
 			Time.fixedDeltaTime = Time.timeScale * 0.02f;
 			playerAudioSource.pitch = Time.timeScale;
-			playerTimeText.text = "TIME SCALE : " + (Mathf.Round (100f * Time.timeScale) * 0.01f).ToString ();
-			if (Time.timeScale >= 1f) {
-
-				Time.timeScale = 1f;
-				Time.fixedDeltaTime = 0.02f;
-				playerAudioSource.pitch = 1f;
-				playerAvailableSlowdown = true;
-				return;
-
-			}
+			playerTimeText.text = "SPEED\n" + Time.timeScale;
+			playerTimeText.color = Color.Lerp (Color.red, Color.white, playerTimeSlow / 100);
 
 		}
 
@@ -169,7 +149,7 @@ public class PlayerMovement : MonoBehaviour {
 
 		if (!playerCharacterController.isGrounded) {
 
-			playerVelocity += Physics.gravity * Time.deltaTime;
+			playerVelocity += Physics.gravity * Time.unscaledDeltaTime;
 
 		} else {
 
@@ -207,46 +187,27 @@ public class PlayerMovement : MonoBehaviour {
 		
 	private	IEnumerator	PlayObstacle(MapObstacle.Obstacle obstacle) {
 
+		float time = 1f;
+
 		playerAvailableMove = false;
-		playerUsingObstacle = true;
 
 		playerCamera.gameObject.SetActive (false);
 		playerFakeCamera.gameObject.SetActive (true);
 
-		#region Obstacle Animations
 		switch(playerObstacleType) {
 			
-			case MapObstacle.Obstacle.Skip:
-				playerFakeCameraAnimator.Play ("ObstacleSkip", -1, 0f);
-				break;
-
-			case MapObstacle.Obstacle.Climb3M:
-				playerFakeCameraAnimator.Play ("ObstacleClimb3M", -1, 0f);
-				break;
-
-			case MapObstacle.Obstacle.Climb4M:
-				playerFakeCameraAnimator.Play ("ObstacleClimb4M", -1, 0f);
-				break;
-
-			case MapObstacle.Obstacle.Slide:
-				playerFakeCameraAnimator.Play ("ObstacleSlide", -1, 0f);
-				break;
-
-			case MapObstacle.Obstacle.Swing:
-				playerFakeCameraAnimator.Play ("ObstacleSwing", -1, 0f);
-				break;
+			case MapObstacle.Obstacle.Skip : time = 1f;	break;
+			case MapObstacle.Obstacle.Climb3M : time = 2f; break;
+			case MapObstacle.Obstacle.Climb4M : time = 2.5f; break;
+			case MapObstacle.Obstacle.Slide : time = 1f; break;
 
 		}
-		#endregion
+		playerFakeCameraAnimator.SetInteger ("Index", (int)playerObstacleType);
+		playerFakeCameraAnimator.SetFloat ("Speed", 1f / Time.timeScale);
 
-		yield return null;
-
-		AnimatorStateInfo info = playerFakeCameraAnimator.GetCurrentAnimatorStateInfo (0);
-
-		yield return new WaitForSeconds (info.length);
+		yield return new WaitForSeconds (time * Time.timeScale);
 
 		playerAvailableMove = true;
-		playerUsingObstacle = false;
 
 		transform.position = playerFakeCameraTransform.position + Vector3.down * 0.7f;
 		playerCameraTransform.rotation = playerFakeCameraTransform.rotation;
@@ -256,6 +217,5 @@ public class PlayerMovement : MonoBehaviour {
 		playerFakeCamera.gameObject.SetActive (false);
 
 	}
-
 
 }

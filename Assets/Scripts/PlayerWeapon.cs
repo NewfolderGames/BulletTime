@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerWeapon : MonoBehaviour {
 
@@ -19,12 +20,17 @@ public class PlayerWeapon : MonoBehaviour {
 	private bool	weaponAvailableSight = true;
 	private	bool	weaponNoammo;
 
+	public	int		weaponDamage;
+
 	public	Transform	weaponSight;
 	public	Vector3		weaponSightPosition;
 
+	public	Text		weaponAmmoText;
+
 	private	Animator	weaponAnimator;
 
-	public	ParticleSystem	weaponShell;	
+	public	ParticleSystem	weaponShell;
+	public	Vector3			weaponShellPosition;
 
 	public	Transform	weaponCameraTransform;
 	public	GameObject	weaponBullet;
@@ -39,6 +45,8 @@ public class PlayerWeapon : MonoBehaviour {
 	}
 
 	void	Update() {
+
+		weaponAnimator.SetFloat ("Speed", 1f / Time.timeScale);
 
 		if (weaponAvailableShoot) {
 
@@ -79,6 +87,8 @@ public class PlayerWeapon : MonoBehaviour {
 
 		}
 
+		weaponShell.transform.localPosition = weaponShellPosition;
+
 	}
 
 	void	WeaponSight(bool onoff) {
@@ -92,6 +102,7 @@ public class PlayerWeapon : MonoBehaviour {
 
 		weaponShell.Emit (1);
 		weaponAmmoCurrent--;
+		WeaponAmmoText ();
 		if (weaponAmmoCurrent <= 0) weaponNoammo = true;
 
 		weaponAvailableReload = false;
@@ -101,7 +112,8 @@ public class PlayerWeapon : MonoBehaviour {
 		else weaponAnimator.SetTrigger ("Fire");
 
 		GameObject bullet = Instantiate (weaponBullet, weaponCameraTransform.position, weaponCameraTransform.rotation);
-		bullet.GetComponent<Rigidbody> ().AddForce (transform.forward * 100f + Vector3.up * 0.5f, ForceMode.Impulse);
+		bullet.GetComponent<Rigidbody> ().AddForce (transform.forward * 7.5f + Vector3.up * 0.125f, ForceMode.Impulse);
+		bullet.GetComponent<Bullet> ().damage = weaponDamage;
 		Destroy (bullet, 15f);
 
 		weaponSoundSource.PlayOneShot (weaponSoundShoot);
@@ -121,8 +133,8 @@ public class PlayerWeapon : MonoBehaviour {
 
 		weaponAnimator.SetTrigger ("Reload");
 	
-		if(!weaponNoammo) yield return new WaitForSeconds (weaponTimeReload);
-		else yield return new WaitForSeconds (weaponTimeReloadNoammo);
+		if(!weaponNoammo) yield return new WaitForSecondsRealtime (weaponTimeReload);
+		else yield return new WaitForSecondsRealtime (weaponTimeReloadNoammo);
 
 		weaponAvailableReload = true;
 		weaponAvailableShoot = true;
@@ -137,6 +149,14 @@ public class PlayerWeapon : MonoBehaviour {
 		}
 
 		weaponNoammo = false;
+		WeaponAmmoText ();
+
+	}
+
+	private	void	WeaponAmmoText() {
+
+		if (weaponAmmoCurrent <= weaponAmmoMax) weaponAmmoText.text = weaponAmmoCurrent.ToString();
+		else weaponAmmoText.text = (weaponAmmoCurrent - 1).ToString() + " + 1";
 
 	}
 
